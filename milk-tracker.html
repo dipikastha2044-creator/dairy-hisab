@@ -1,0 +1,1291 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Dudh Hisab">
+<meta name="application-name" content="Dudh Hisab">
+<meta name="theme-color" content="#0f1923">
+<meta name="description" content="Sinkemani Dairy — दैनिक दूध डेलिभरी हिसाब किताब">
+<link rel="manifest" id="pwa-manifest">
+<link rel="apple-touch-icon" id="apple-icon">
+<title>🥛 Sinkemani Dairy — हिसाब</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0f1923;--card:#172130;--card2:#1e2d3f;--border:#2a3f55;
+    --blue:#3b9eff;--blue-light:#6fb8ff;--teal:#2dd4c0;--gold:#f5c842;
+    --red:#ff6b6b;--green:#4ade80;--purple:#a78bfa;--text:#e8f4ff;--muted:#7a9ab8;--white:#fff;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);font-family:'Nunito',sans-serif;color:var(--text);min-height:100vh;
+    background-image:radial-gradient(ellipse at 20% 10%,rgba(59,158,255,.08) 0%,transparent 50%),radial-gradient(ellipse at 80% 90%,rgba(45,212,192,.06) 0%,transparent 50%);}
+  .app{max-width:520px;margin:0 auto;padding:0 0 80px;}
+
+  .header{background:linear-gradient(135deg,#1a3a5c,#0f2035);padding:22px 20px 16px;text-align:center;
+    border-bottom:2px solid var(--blue);position:sticky;top:0;z-index:100;box-shadow:0 4px 24px rgba(0,0,0,.4);}
+  .header h1{font-size:1.4rem;font-weight:900;color:var(--white);}
+  .header h1 span{color:var(--blue-light);}
+  .header p{font-size:.75rem;color:var(--muted);margin-top:2px;}
+
+  .tabs{display:flex;background:var(--card);border-bottom:1px solid var(--border);position:sticky;top:72px;z-index:99;overflow-x:auto;}
+  .tab{flex:1;min-width:60px;padding:11px 6px;font-size:.72rem;font-weight:700;color:var(--muted);
+    background:none;border:none;cursor:pointer;border-bottom:3px solid transparent;transition:all .2s;font-family:'Nunito',sans-serif;white-space:nowrap;}
+  .tab.active{color:var(--blue-light);border-bottom-color:var(--blue);background:rgba(59,158,255,.05);}
+
+  .section{padding:16px;display:none;}
+  .section.active{display:block;}
+
+  .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px;}
+  .card-title{font-size:.7rem;letter-spacing:2px;text-transform:uppercase;color:var(--blue);margin-bottom:12px;font-weight:700;}
+
+  label{display:block;font-size:.8rem;color:var(--muted);margin-bottom:4px;font-weight:600;}
+  input,select{width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;padding:9px 12px;
+    font-size:.9rem;color:var(--text);font-family:'Nunito',sans-serif;margin-bottom:10px;transition:border-color .2s;outline:none;}
+  input:focus,select:focus{border-color:var(--blue);}
+  select option{background:#1a2a3a;}
+
+  .btn{display:block;width:100%;padding:11px;border-radius:10px;border:none;font-size:.88rem;font-weight:800;
+    cursor:pointer;font-family:'Nunito',sans-serif;transition:all .2s;}
+  .btn-primary{background:linear-gradient(135deg,var(--blue),#1a7ee0);color:white;box-shadow:0 4px 16px rgba(59,158,255,.3);}
+  .btn-primary:hover{transform:translateY(-1px);}
+  .btn-teal{background:linear-gradient(135deg,var(--teal),#17a896);color:#0f1923;}
+  .btn-purple{background:linear-gradient(135deg,var(--purple),#7c3aed);color:white;}
+  .btn-danger{background:rgba(255,107,107,.12);color:var(--red);border:1px solid rgba(255,107,107,.3);padding:6px 12px;font-size:.75rem;width:auto;display:inline-block;}
+  .btn-sm{padding:7px 13px;font-size:.76rem;border-radius:7px;width:auto;display:inline-block;
+    background:rgba(59,158,255,.12);color:var(--blue-light);border:1px solid rgba(59,158,255,.3);
+    cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;transition:all .2s;}
+
+  .flex-row{display:flex;gap:8px;}
+  .flex-row>*{flex:1;}
+  .section-title{font-size:.83rem;font-weight:800;color:var(--text);margin-bottom:10px;}
+
+  /* CUSTOMER */
+  .customer-item{display:flex;align-items:center;justify-content:space-between;background:var(--card2);
+    border:1px solid var(--border);border-radius:10px;padding:11px 13px;margin-bottom:8px;}
+  .customer-avatar{width:36px;height:36px;background:linear-gradient(135deg,var(--blue),var(--teal));border-radius:50%;
+    display:flex;align-items:center;justify-content:center;font-size:.95rem;font-weight:800;color:white;flex-shrink:0;margin-right:10px;}
+  .customer-info{flex:1;}
+  .customer-name{font-weight:800;font-size:.92rem;}
+  .customer-sub{font-size:.72rem;color:var(--muted);margin-top:1px;}
+
+  /* ITEMS */
+  .item-chip{display:inline-flex;align-items:center;gap:6px;background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.3);
+    border-radius:20px;padding:4px 12px;margin:3px;font-size:.78rem;color:var(--purple);}
+  .item-chip button{background:none;border:none;color:var(--red);cursor:pointer;font-size:.85rem;padding:0;line-height:1;}
+
+  /* CALENDAR */
+  .day-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:12px;}
+  .day-label{text-align:center;font-size:.62rem;color:var(--muted);font-weight:700;padding:3px 0;}
+  .day-cell{aspect-ratio:1;background:var(--bg);border:1.5px solid var(--border);border-radius:6px;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;min-height:38px;}
+  .day-cell:hover{border-color:var(--blue);background:rgba(59,158,255,.08);}
+  .day-cell.has-entry{border-color:var(--teal);background:rgba(45,212,192,.08);}
+  .day-cell.selected{border-color:var(--gold);background:rgba(245,200,66,.1);}
+  .day-cell.empty{opacity:.2;cursor:default;pointer-events:none;}
+  .day-num{font-size:.66rem;font-weight:700;color:var(--muted);}
+  .day-cell.has-entry .day-num{color:var(--teal);}
+  .day-cell.selected .day-num{color:var(--gold);}
+  .day-ltr{font-size:.62rem;font-weight:800;color:var(--text);}
+
+  /* ENTRY PANEL */
+  .entry-panel{background:var(--card);border:1.5px solid var(--gold);border-radius:12px;padding:14px;margin-bottom:12px;display:none;}
+  .entry-panel.visible{display:block;animation:slideDown .2s ease;}
+  @keyframes slideDown{from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:translateY(0);}}
+  .entry-panel h4{font-size:.83rem;font-weight:800;color:var(--gold);margin-bottom:10px;}
+
+  .ltr-buttons{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px;}
+  .ltr-btn{padding:9px 4px;background:var(--bg);border:1.5px solid var(--border);border-radius:7px;
+    color:var(--text);font-size:.82rem;font-weight:800;cursor:pointer;text-align:center;transition:all .15s;font-family:'Nunito',sans-serif;}
+  .ltr-btn:hover{border-color:var(--blue);background:rgba(59,158,255,.1);}
+  .ltr-btn.selected{border-color:var(--teal);background:rgba(45,212,192,.15);color:var(--teal);}
+
+  /* EXTRA ITEMS ENTRY */
+  .extra-item-row{display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--border);
+    border-radius:8px;padding:8px 10px;margin-bottom:6px;}
+  .extra-item-name{flex:1;font-size:.83rem;font-weight:700;}
+  .extra-item-qty{width:70px;margin-bottom:0;text-align:center;padding:6px 8px;}
+  .extra-item-unit{font-size:.72rem;color:var(--muted);white-space:nowrap;}
+
+  /* BILL */
+  .bill-card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:12px;}
+  .bill-header{background:linear-gradient(135deg,#1a3a5c,#0f2a40);padding:14px 16px;display:flex;justify-content:space-between;align-items:flex-start;}
+  .bill-cust-name{font-size:1rem;font-weight:800;}
+  .bill-period{font-size:.72rem;color:var(--muted);margin-top:2px;}
+  .bill-total-lbl{font-size:.68rem;color:var(--muted);}
+  .bill-total-amt{font-size:1.4rem;font-weight:900;color:var(--gold);line-height:1;}
+  .bill-table{width:100%;border-collapse:collapse;}
+  .bill-table th{background:rgba(59,158,255,.08);color:var(--muted);font-size:.7rem;letter-spacing:1px;padding:9px 12px;text-align:left;font-weight:700;text-transform:uppercase;}
+  .bill-table td{padding:8px 12px;font-size:.83rem;border-bottom:1px solid var(--border);}
+  .bill-table tr:last-child td{border-bottom:none;}
+  .bill-footer{background:rgba(245,200,66,.06);border-top:2px solid rgba(245,200,66,.3);padding:12px 16px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+  .bf-item{text-align:center;}
+  .bf-lbl{font-size:.66rem;color:var(--muted);margin-bottom:2px;}
+  .bf-val{font-size:.95rem;font-weight:800;}
+  .bf-val.green{color:var(--green);}
+  .bf-val.gold{color:var(--gold);}
+  .bf-val.blue{color:var(--blue-light);}
+
+  /* DUE */
+  .due-box{background:rgba(255,107,107,.08);border:1.5px solid rgba(255,107,107,.3);border-radius:10px;padding:12px 14px;margin-bottom:10px;}
+  .due-box-title{font-size:.7rem;letter-spacing:2px;text-transform:uppercase;color:var(--red);margin-bottom:8px;font-weight:700;}
+  .due-amount{font-size:1.3rem;font-weight:900;color:var(--red);}
+
+  .empty{text-align:center;padding:36px 20px;color:var(--muted);}
+  .empty-icon{font-size:2.2rem;margin-bottom:8px;}
+  .empty p{font-size:.85rem;}
+
+  .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--card);
+    border:1px solid var(--teal);color:var(--teal);padding:9px 20px;border-radius:50px;font-size:.83rem;
+    font-weight:700;z-index:999;transition:transform .3s;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,.4);}
+  .toast.show{transform:translateX(-50%) translateY(0);}
+
+  .badge{display:inline-block;padding:2px 8px;border-radius:50px;font-size:.68rem;font-weight:700;}
+  .badge-blue{background:rgba(59,158,255,.15);color:var(--blue-light);}
+  .badge-purple{background:rgba(167,139,250,.15);color:var(--purple);}
+  .badge-red{background:rgba(255,107,107,.15);color:var(--red);}
+  .badge-green{background:rgba(74,222,128,.15);color:var(--green);}
+
+  /* PAYMENT */
+  .pay-history-item{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:11px 14px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;}
+  .pay-amount{font-size:1.1rem;font-weight:900;color:var(--green);}
+  .pay-meta{font-size:.72rem;color:var(--muted);margin-top:2px;}
+  .pay-note{font-size:.75rem;color:var(--text);margin-top:2px;font-style:italic;}
+
+  .balance-box{border-radius:12px;padding:16px;margin-bottom:12px;text-align:center;}
+  .balance-box.positive{background:rgba(74,222,128,.08);border:1.5px solid rgba(74,222,128,.3);}
+  .balance-box.negative{background:rgba(255,107,107,.08);border:1.5px solid rgba(255,107,107,.35);}
+  .balance-box.zero{background:rgba(59,158,255,.08);border:1.5px solid rgba(59,158,255,.3);}
+  .balance-lbl{font-size:.68rem;letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-bottom:4px;}
+  .balance-amt{font-size:2rem;font-weight:900;line-height:1;}
+  .balance-sub{font-size:.75rem;margin-top:4px;opacity:.8;}
+
+  .ledger-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:.83rem;}
+  .ledger-row:last-child{border-bottom:none;}
+  .ledger-dr{color:var(--red);font-weight:700;}
+  .ledger-cr{color:var(--green);font-weight:700;}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="header">
+    <div style="display:flex;align-items:center;justify-content:center;gap:12px;">
+      <svg id="dairy-logo" width="54" height="54" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <!-- Background circle -->
+        <circle cx="60" cy="60" r="58" fill="#0a3d6b" stroke="#3b9eff" stroke-width="2.5"/>
+        <!-- Cow body -->
+        <ellipse cx="60" cy="72" rx="28" ry="18" fill="#f5f0e8" stroke="#c8a97a" stroke-width="1.5"/>
+        <!-- Cow head -->
+        <ellipse cx="84" cy="60" rx="13" ry="11" fill="#f5f0e8" stroke="#c8a97a" stroke-width="1.5"/>
+        <!-- Cow nose/muzzle -->
+        <ellipse cx="91" cy="64" rx="6" ry="4.5" fill="#f0c8b0" stroke="#c8a97a" stroke-width="1"/>
+        <!-- Nostrils -->
+        <circle cx="89" cy="65" r="1.2" fill="#b0806a"/>
+        <circle cx="93" cy="65" r="1.2" fill="#b0806a"/>
+        <!-- Eye -->
+        <circle cx="83" cy="57" r="2.2" fill="#2a1a0a"/>
+        <circle cx="83.8" cy="56.3" r="0.7" fill="white"/>
+        <!-- Ear -->
+        <ellipse cx="77" cy="50" rx="4" ry="6" fill="#f5f0e8" stroke="#c8a97a" stroke-width="1.2" transform="rotate(-20 77 50)"/>
+        <ellipse cx="77" cy="50" rx="2.2" ry="3.5" fill="#f0c0b0" transform="rotate(-20 77 50)"/>
+        <!-- Horns -->
+        <path d="M78 49 Q74 40 78 38" stroke="#d4aa60" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <path d="M82 47 Q80 38 85 37" stroke="#d4aa60" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <!-- Cow spots -->
+        <ellipse cx="52" cy="68" rx="7" ry="5" fill="#8B6B4A" opacity="0.5" transform="rotate(-15 52 68)"/>
+        <ellipse cx="66" cy="75" rx="5" ry="4" fill="#8B6B4A" opacity="0.4" transform="rotate(10 66 75)"/>
+        <!-- Legs -->
+        <rect x="38" y="86" width="6" height="13" rx="3" fill="#f0e8d8" stroke="#c8a97a" stroke-width="1"/>
+        <rect x="48" y="87" width="6" height="13" rx="3" fill="#f0e8d8" stroke="#c8a97a" stroke-width="1"/>
+        <rect x="62" y="87" width="6" height="13" rx="3" fill="#f0e8d8" stroke="#c8a97a" stroke-width="1"/>
+        <rect x="72" y="86" width="6" height="13" rx="3" fill="#f0e8d8" stroke="#c8a97a" stroke-width="1"/>
+        <!-- Udder -->
+        <ellipse cx="55" cy="89" rx="10" ry="6" fill="#f4b8c0" stroke="#d88899" stroke-width="1"/>
+        <!-- Milk drops falling -->
+        <ellipse cx="26" cy="75" rx="5" ry="7" fill="white" opacity="0.92"/>
+        <ellipse cx="26" cy="69" rx="3.5" ry="3.5" fill="white" opacity="0.92"/>
+        <path d="M26 72 Q30 73 26 82" fill="white" opacity="0.5"/>
+        <!-- Milk splash lines -->
+        <line x1="19" y1="80" x2="16" y2="76" stroke="white" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+        <line x1="33" y1="80" x2="36" y2="76" stroke="white" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+        <line x1="26" y1="83" x2="26" y2="87" stroke="white" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+        <!-- Tail -->
+        <path d="M32 72 Q22 65 24 56 Q25 52 28 54" stroke="#c8a97a" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <ellipse cx="28.5" cy="53" rx="3" ry="4" fill="#c8a97a" transform="rotate(-20 28.5 53)"/>
+      </svg>
+      <div>
+        <h1 style="font-size:1.35rem;">Sinkemani <span>Dairy</span></h1>
+        <p style="font-size:.72rem;margin-top:1px;">दैनिक डेलिभरी हिसाब किताब</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('customers',this)">👥 Customers</button>
+    <button class="tab" onclick="switchTab('items',this)">📦 Items</button>
+    <button class="tab" onclick="switchTab('entry',this)">📝 Entry</button>
+    <button class="tab" onclick="switchTab('payment',this)">💰 Payment</button>
+    <button class="tab" onclick="switchTab('bill',this)">🧾 Bill</button>
+  </div>
+
+  <!-- ═══ CUSTOMERS TAB ═══ -->
+  <div class="section active" id="tab-customers">
+    <div class="card">
+      <div class="card-title">➕ नयाँ Customer थप्नुस्</div>
+      <label>Customer को नाम</label>
+      <input type="text" id="cust-name" placeholder="जस्तै: Ram Bahadur">
+      <div class="flex-row">
+        <div><label>ठेगाना / घर नं.</label><input type="text" id="cust-addr" placeholder="घर नं. ५"></div>
+        <div><label>Default दूध (L/दिन)</label><input type="number" id="cust-default" placeholder="2" min="0.5" step="0.5"></div>
+      </div>
+      <label>दूधको दर (रु./लिटर)</label>
+      <input type="number" id="cust-rate" placeholder="120" min="1">
+      <label>अघिल्लो बाँकी (Previous Due रु.)</label>
+      <input type="number" id="cust-due" placeholder="0" min="0">
+      <button class="btn btn-primary" onclick="addCustomer()">✅ Customer थप्नुस्</button>
+    </div>
+    <div class="section-title">👥 सबै Customers</div>
+    <div id="customer-list"><div class="empty"><div class="empty-icon">🧑‍🤝‍🧑</div><p>कुनै customer छैन।</p></div></div>
+  </div>
+
+  <!-- ═══ ITEMS TAB ═══ -->
+  <div class="section" id="tab-items">
+    <div class="card">
+      <div class="card-title">➕ नयाँ Item थप्नुस् (दूध बाहेक)</div>
+      <div class="flex-row">
+        <div><label>Item नाम</label><input type="text" id="item-name" placeholder="जस्तै: Paneer"></div>
+        <div><label>Unit</label>
+          <select id="item-unit">
+            <option value="kg">kg</option>
+            <option value="g">g</option>
+            <option value="ltr">ltr</option>
+            <option value="pcs">pcs</option>
+            <option value="packet">packet</option>
+            <option value="box">box</option>
+          </select>
+        </div>
+      </div>
+      <label>दर (रु. per unit)</label>
+      <input type="number" id="item-rate" placeholder="जस्तै: 400" min="0">
+      <button class="btn btn-purple" onclick="addItem()">✅ Item थप्नुस्</button>
+    </div>
+    <div class="section-title">📦 Items सूची</div>
+    <div id="item-list"><div class="empty"><div class="empty-icon">📦</div><p>कुनै item छैन।<br>माथि थप्नुस्।</p></div></div>
+  </div>
+
+  <!-- ═══ ENTRY TAB ═══ -->
+  <div class="section" id="tab-entry">
+    <div class="card">
+      <div class="card-title">📅 महिना र Customer छान्नुस्</div>
+      <label>Customer</label>
+      <select id="entry-customer" onchange="loadCalendar()">
+        <option value="">-- Customer छान्नुस् --</option>
+      </select>
+      <div class="flex-row">
+        <div><label>महिना</label>
+          <select id="entry-month" onchange="loadCalendar()">
+            <option value="1">बैशाख</option><option value="2">जेठ</option><option value="3">असार</option>
+            <option value="4">साउन</option><option value="5">भाद्र</option><option value="6">आश्विन</option>
+            <option value="7">कार्तिक</option><option value="8">मंसिर</option><option value="9">पुष</option>
+            <option value="10">माघ</option><option value="11">फाल्गुन</option><option value="12">चैत</option>
+          </select>
+        </div>
+        <div><label>वर्ष (BS)</label><input type="number" id="entry-year" value="2081" min="2070" max="2090" onchange="loadCalendar()"></div>
+      </div>
+    </div>
+
+    <div id="calendar-area"></div>
+
+    <!-- Milk entry panel -->
+    <div class="entry-panel" id="entry-panel">
+      <h4 id="entry-panel-title">📅 दिन छान्नुस्</h4>
+      <p style="font-size:.78rem;color:var(--muted);margin-bottom:8px;">🥛 दूध — कति लिटर?</p>
+      <div class="ltr-buttons">
+        <div class="ltr-btn" onclick="selectLtr(0.5)">½ L</div>
+        <div class="ltr-btn" onclick="selectLtr(1)">1 L</div>
+        <div class="ltr-btn" onclick="selectLtr(1.5)">1.5 L</div>
+        <div class="ltr-btn" onclick="selectLtr(2)">2 L</div>
+        <div class="ltr-btn" onclick="selectLtr(2.5)">2.5 L</div>
+        <div class="ltr-btn" onclick="selectLtr(3)">3 L</div>
+        <div class="ltr-btn" onclick="selectLtr(0)">❌ 0</div>
+        <div class="ltr-btn" onclick="selectLtr(-1)" style="font-size:.68rem">Custom</div>
+      </div>
+      <div id="custom-ltr-row" style="display:none;margin-bottom:10px;display:none;">
+        <div class="flex-row" style="align-items:center;">
+          <input type="number" id="custom-ltr-val" placeholder="लिटर" min="0" step="0.5" style="margin-bottom:0;width:90px;">
+          <button class="btn-sm" onclick="applyCustomLtr()">ठीक छ</button>
+        </div>
+      </div>
+
+      <!-- Extra items section -->
+      <div id="extra-items-section" style="display:none;margin-top:10px;">
+        <p style="font-size:.75rem;color:var(--purple);font-weight:700;margin-bottom:6px;">📦 अन्य Items</p>
+        <div id="extra-items-inputs"></div>
+      </div>
+
+      <div style="display:flex;gap:8px;margin-top:8px;">
+        <button class="btn btn-teal" onclick="saveEntry()" style="flex:1">💾 Save</button>
+        <button class="btn" onclick="deleteEntry()" style="flex:.4;background:rgba(255,107,107,.1);color:var(--red);border:1px solid rgba(255,107,107,.2)">🗑️ हटाउ</button>
+      </div>
+    </div>
+
+    <!-- Month summary -->
+    <div id="month-summary" style="display:none;">
+      <div class="card" style="background:rgba(45,212,192,.07);border-color:rgba(45,212,192,.3);">
+        <div class="card-title" style="color:var(--teal)">📊 यो महिनाको सारांश</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;text-align:center;">
+          <div><div style="font-size:.68rem;color:var(--muted)">दिन</div><div id="sum-days" style="font-size:1.2rem;font-weight:800;color:var(--teal)">0</div></div>
+          <div><div style="font-size:.68rem;color:var(--muted)">लिटर</div><div id="sum-ltrs" style="font-size:1.2rem;font-weight:800;color:var(--blue-light)">0</div></div>
+          <div><div style="font-size:.68rem;color:var(--muted)">रकम</div><div id="sum-amt" style="font-size:1rem;font-weight:800;color:var(--gold)">रु.0</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ PAYMENT TAB ═══ -->
+  <div class="section" id="tab-payment">
+    <div class="card">
+      <div class="card-title">💰 भुक्तानी Record गर्नुस्</div>
+      <label>Customer</label>
+      <select id="pay-customer" onchange="loadPaymentSummary()">
+        <option value="">-- Customer छान्नुस् --</option>
+      </select>
+      <div class="flex-row">
+        <div><label>महिना</label>
+          <select id="pay-month" onchange="loadPaymentSummary()">
+            <option value="1">बैशाख</option><option value="2">जेठ</option><option value="3">असार</option>
+            <option value="4">साउन</option><option value="5">भाद्र</option><option value="6">आश्विन</option>
+            <option value="7">कार्तिक</option><option value="8">मंसिर</option><option value="9">पुष</option>
+            <option value="10">माघ</option><option value="11">फाल्गुन</option><option value="12">चैत</option>
+          </select>
+        </div>
+        <div><label>वर्ष (BS)</label><input type="number" id="pay-year" value="2081" min="2070" max="2090" onchange="loadPaymentSummary()"></div>
+      </div>
+    </div>
+
+    <!-- Balance summary -->
+    <div id="pay-balance-area"></div>
+
+    <!-- Add payment -->
+    <div class="card" id="pay-add-card" style="display:none;">
+      <div class="card-title">➕ नयाँ भुक्तानी थप्नुस्</div>
+      <label>भुक्तानी रकम (रु.)</label>
+      <input type="number" id="pay-amount-input" placeholder="जस्तै: 3000" min="0">
+      <label>मिति</label>
+      <input type="text" id="pay-date-input" placeholder="जस्तै: बैशाख १५">
+      <label>नोट (optional)</label>
+      <input type="text" id="pay-note-input" placeholder="जस्तै: Cash दिनुभयो">
+      <button class="btn btn-teal" onclick="addPayment()">✅ भुक्तानी Save गर्नुस्</button>
+    </div>
+
+    <!-- Payment history -->
+    <div id="pay-history-area"></div>
+  </div>
+
+  <!-- ═══ BILL TAB ═══ -->
+  <div class="section" id="tab-bill">
+    <div class="card">
+      <div class="card-title">🧾 Bill छान्नुस्</div>
+      <label>Customer</label>
+      <select id="bill-customer" onchange="generateBill()">
+        <option value="">-- Customer छान्नुस् --</option>
+      </select>
+      <div class="flex-row">
+        <div><label>महिना</label>
+          <select id="bill-month" onchange="generateBill()">
+            <option value="1">बैशाख</option><option value="2">जेठ</option><option value="3">असार</option>
+            <option value="4">साउन</option><option value="5">भाद्र</option><option value="6">आश्विन</option>
+            <option value="7">कार्तिक</option><option value="8">मंसिर</option><option value="9">पुष</option>
+            <option value="10">माघ</option><option value="11">फाल्गुन</option><option value="12">चैत</option>
+          </select>
+        </div>
+        <div><label>वर्ष (BS)</label><input type="number" id="bill-year" value="2081" min="2070" max="2090" onchange="generateBill()"></div>
+      </div>
+      <label>Previous Due (रु.) — override</label>
+      <input type="number" id="bill-due-override" placeholder="0" min="0" onchange="generateBill()">
+    </div>
+    <div id="bill-area"><div class="empty"><div class="empty-icon">🧾</div><p>Customer र महिना छानेर Bill हेर्नुस्।</p></div></div>
+  </div>
+
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ── DATA ──
+let customers = JSON.parse(localStorage.getItem('sd_customers') || '[]');
+let items     = JSON.parse(localStorage.getItem('sd_items')     || '[]');
+let entries   = JSON.parse(localStorage.getItem('sd_entries')   || '{}');
+// extraEntries[custId_year_month_day] = { itemId: qty, ... }
+let extraEntries = JSON.parse(localStorage.getItem('sd_extra')  || '{}');
+// payments[custId_year_month] = [ {id, amount, date, note}, ... ]
+let payments = JSON.parse(localStorage.getItem('sd_payments') || '{}');
+
+const MONTHS = ['बैशाख','जेठ','असार','साउन','भाद्र','आश्विन','कार्तिक','मंसिर','पुष','माघ','फाल्गुन','चैत'];
+const DAYS_IN_MONTH = [31,32,31,32,31,30,30,29,30,29,30,30];
+
+let selectedDay = null;
+let selectedLtr = null;
+
+function save() {
+  localStorage.setItem('sd_customers', JSON.stringify(customers));
+  localStorage.setItem('sd_items',     JSON.stringify(items));
+  localStorage.setItem('sd_entries',   JSON.stringify(entries));
+  localStorage.setItem('sd_extra',     JSON.stringify(extraEntries));
+  localStorage.setItem('sd_payments',  JSON.stringify(payments));
+}
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ── TABS ──
+function switchTab(tab, el) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  el.classList.add('active');
+  if (tab === 'entry')   { populateDropdown('entry-customer'); loadCalendar(); }
+  if (tab === 'bill')    { populateDropdown('bill-customer');  generateBill(); }
+  if (tab === 'items')   renderItems();
+  if (tab === 'payment') { populateDropdown('pay-customer'); loadPaymentSummary(); }
+}
+
+// ── CUSTOMERS ──
+function addCustomer() {
+  const name = document.getElementById('cust-name').value.trim();
+  if (!name) { toast('❌ नाम लेख्नुस्!'); return; }
+  const addr = document.getElementById('cust-addr').value.trim();
+  const def  = parseFloat(document.getElementById('cust-default').value) || 2;
+  const rate = parseFloat(document.getElementById('cust-rate').value) || 120;
+  const due  = parseFloat(document.getElementById('cust-due').value) || 0;
+  customers.push({ id: Date.now().toString(), name, addr, default: def, rate, due });
+  save(); renderCustomers(); populateDropdown('entry-customer'); populateDropdown('bill-customer');
+  ['cust-name','cust-addr','cust-default','cust-rate','cust-due'].forEach(id => document.getElementById(id).value = '');
+  toast('✅ ' + name + ' थपियो!');
+}
+
+function editDue(id) {
+  const c = customers.find(x => x.id === id);
+  const v = prompt('Previous due amount (रु.):', c.due || 0);
+  if (v === null) return;
+  c.due = parseFloat(v) || 0;
+  save(); renderCustomers(); toast('✅ Due update भयो।');
+}
+
+function deleteCustomer(id) {
+  if (!confirm('यो customer हटाउने?')) return;
+  customers = customers.filter(c => c.id !== id);
+  Object.keys(entries).forEach(k => { if (k.startsWith(id+'_')) delete entries[k]; });
+  Object.keys(extraEntries).forEach(k => { if (k.startsWith(id+'_')) delete extraEntries[k]; });
+  save(); renderCustomers(); populateDropdown('entry-customer'); populateDropdown('bill-customer');
+  toast('🗑️ हटाइयो।');
+}
+
+function renderCustomers() {
+  const el = document.getElementById('customer-list');
+  if (!customers.length) { el.innerHTML = `<div class="empty"><div class="empty-icon">🧑‍🤝‍🧑</div><p>कुनै customer छैन।</p></div>`; return; }
+  el.innerHTML = customers.map(c => `
+    <div class="customer-item">
+      <div class="customer-avatar">${c.name[0].toUpperCase()}</div>
+      <div class="customer-info">
+        <div class="customer-name">${c.name}</div>
+        <div class="customer-sub">${c.addr||'ठेगाना छैन'} · ${c.default}L · रु.${c.rate}/L${c.due?` · <span style="color:var(--red)">Due:रु.${c.due}</span>`:''}</div>
+      </div>
+      <div style="display:flex;gap:6px;flex-shrink:0;">
+        <button class="btn-sm" onclick="editDue('${c.id}')" style="color:var(--gold);border-color:rgba(245,200,66,.3)">Due</button>
+        <button class="btn btn-danger" onclick="deleteCustomer('${c.id}')">हटाउ</button>
+      </div>
+    </div>`).join('');
+}
+
+// ── ITEMS ──
+function addItem() {
+  const name = document.getElementById('item-name').value.trim();
+  if (!name) { toast('❌ Item नाम लेख्नुस्!'); return; }
+  const unit = document.getElementById('item-unit').value;
+  const rate = parseFloat(document.getElementById('item-rate').value) || 0;
+  items.push({ id: Date.now().toString(), name, unit, rate });
+  save(); renderItems();
+  document.getElementById('item-name').value = '';
+  document.getElementById('item-rate').value = '';
+  toast('✅ ' + name + ' थपियो!');
+}
+
+function deleteItem(id) {
+  items = items.filter(i => i.id !== id);
+  save(); renderItems(); toast('🗑️ Item हटाइयो।');
+}
+
+function renderItems() {
+  const el = document.getElementById('item-list');
+  if (!items.length) { el.innerHTML = `<div class="empty"><div class="empty-icon">📦</div><p>कुनै item छैन।</p></div>`; return; }
+  el.innerHTML = items.map(it => `
+    <div class="customer-item">
+      <div class="customer-avatar" style="background:linear-gradient(135deg,var(--purple),#7c3aed)">${it.name[0]}</div>
+      <div class="customer-info">
+        <div class="customer-name">${it.name}</div>
+        <div class="customer-sub">रु.${it.rate} / ${it.unit}</div>
+      </div>
+      <button class="btn btn-danger" onclick="deleteItem('${it.id}')">हटाउ</button>
+    </div>`).join('');
+}
+
+// ── DROPDOWNS ──
+function populateDropdown(selId) {
+  const sel = document.getElementById(selId);
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">-- Customer छान्नुस् --</option>' +
+    customers.map(c => `<option value="${c.id}" ${c.id===cur?'selected':''}>${c.name}</option>`).join('');
+}
+
+// ── ENTRY KEY ──
+function eKey(cId, y, m, d) { return `${cId}_${y}_${m}_${d}`; }
+
+// ── CALENDAR ──
+function loadCalendar() {
+  const custId = document.getElementById('entry-customer').value;
+  const month  = parseInt(document.getElementById('entry-month').value);
+  const year   = parseInt(document.getElementById('entry-year').value);
+  if (!custId) {
+    document.getElementById('calendar-area').innerHTML = `<div style="text-align:center;padding:24px;color:var(--muted);font-size:.85rem;">👆 पहिले customer छान्नुस्</div>`;
+    document.getElementById('entry-panel').classList.remove('visible');
+    document.getElementById('month-summary').style.display = 'none';
+    return;
+  }
+  const cust = customers.find(c => c.id === custId);
+  const days = DAYS_IN_MONTH[month-1];
+  selectedDay = null; selectedLtr = null;
+  document.getElementById('entry-panel').classList.remove('visible');
+
+  let html = `<div class="card"><div class="card-title">📅 ${MONTHS[month-1]} ${year} — ${cust.name}</div>
+    <div class="day-grid">
+    <div class="day-label">आइत</div><div class="day-label">सोम</div><div class="day-label">मंगल</div>
+    <div class="day-label">बुध</div><div class="day-label">बिही</div><div class="day-label">शुक्र</div><div class="day-label">शनि</div>`;
+  const off = (year * 12 + month) % 7;
+  for (let i = 0; i < off; i++) html += `<div class="day-cell empty"></div>`;
+  for (let d = 1; d <= days; d++) {
+    const key = eKey(custId, year, month, d);
+    const val = entries[key];
+    const hasExtra = extraEntries[key] && Object.values(extraEntries[key]).some(v => v > 0);
+    const hasEntry = val !== undefined;
+    html += `<div class="day-cell ${hasEntry?'has-entry':''}" id="dc-${d}" onclick="selectDay(${d})">
+      <span class="day-num">${d}</span>
+      ${hasEntry ? `<span class="day-ltr">${val}L</span>` : ''}
+      ${hasExtra ? `<span style="font-size:.5rem;color:var(--purple)">+</span>` : ''}
+    </div>`;
+  }
+  html += `</div></div>`;
+  document.getElementById('calendar-area').innerHTML = html;
+  updateSummary(custId, month, year);
+}
+
+function selectDay(d) {
+  const custId = document.getElementById('entry-customer').value;
+  const month  = parseInt(document.getElementById('entry-month').value);
+  const year   = parseInt(document.getElementById('entry-year').value);
+  document.querySelectorAll('.day-cell.selected').forEach(el => el.classList.remove('selected'));
+  document.getElementById('dc-'+d)?.classList.add('selected');
+  selectedDay = d; selectedLtr = null;
+  document.querySelectorAll('.ltr-btn').forEach(b => b.classList.remove('selected'));
+  document.getElementById('custom-ltr-row').style.display = 'none';
+  document.getElementById('custom-ltr-val').value = '';
+
+  const key = eKey(custId, year, month, d);
+  const existing = entries[key];
+  if (existing !== undefined) { selectedLtr = existing; highlightLtrBtn(existing); }
+
+  const cust = customers.find(c => c.id === custId);
+  document.getElementById('entry-panel-title').textContent = `📅 ${MONTHS[month-1]} ${d} गते — ${cust.name}`;
+
+  // Render extra items inputs
+  const extraSection = document.getElementById('extra-items-section');
+  const extraInputs  = document.getElementById('extra-items-inputs');
+  if (items.length > 0) {
+    extraSection.style.display = 'block';
+    const saved = extraEntries[key] || {};
+    extraInputs.innerHTML = items.map(it => `
+      <div class="extra-item-row">
+        <div class="extra-item-name">${it.name}</div>
+        <input class="extra-item-qty" type="number" id="extra-${it.id}" value="${saved[it.id]||''}" placeholder="0" min="0" step="0.1" style="margin-bottom:0;">
+        <div class="extra-item-unit">${it.unit}</div>
+      </div>`).join('');
+  } else {
+    extraSection.style.display = 'none';
+  }
+
+  document.getElementById('entry-panel').classList.add('visible');
+  document.getElementById('entry-panel').scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+
+function highlightLtrBtn(val) {
+  document.querySelectorAll('.ltr-btn').forEach(b => b.classList.remove('selected'));
+  const presets = [0.5,1,1.5,2,2.5,3,0];
+  const idx = presets.indexOf(val);
+  if (idx !== -1) document.querySelectorAll('.ltr-btn')[idx].classList.add('selected');
+}
+
+function selectLtr(v) {
+  document.querySelectorAll('.ltr-btn').forEach(b => b.classList.remove('selected'));
+  event.target.classList.add('selected');
+  if (v === -1) { document.getElementById('custom-ltr-row').style.display = 'flex'; selectedLtr = null; }
+  else { document.getElementById('custom-ltr-row').style.display = 'none'; selectedLtr = v; }
+}
+
+function applyCustomLtr() {
+  const v = parseFloat(document.getElementById('custom-ltr-val').value);
+  if (isNaN(v) || v < 0) { toast('❌ सही संख्या हाल्नुस्'); return; }
+  selectedLtr = v; toast('✅ ' + v + 'L सेट भयो');
+}
+
+function saveEntry() {
+  const custId = document.getElementById('entry-customer').value;
+  const month  = parseInt(document.getElementById('entry-month').value);
+  const year   = parseInt(document.getElementById('entry-year').value);
+  if (!selectedDay) { toast('❌ दिन छान्नुस्'); return; }
+  if (selectedLtr === null) { toast('❌ दूध लिटर छान्नुस्'); return; }
+
+  const key = eKey(custId, year, month, selectedDay);
+  entries[key] = selectedLtr;
+
+  // save extra items
+  if (items.length > 0) {
+    const extraData = {};
+    items.forEach(it => {
+      const val = parseFloat(document.getElementById('extra-'+it.id)?.value) || 0;
+      if (val > 0) extraData[it.id] = val;
+    });
+    if (Object.keys(extraData).length > 0) extraEntries[key] = extraData;
+    else delete extraEntries[key];
+  }
+
+  save(); loadCalendar();
+  document.getElementById('entry-panel').classList.remove('visible');
+  toast(`✅ ${selectedDay} गते save भयो!`);
+}
+
+function deleteEntry() {
+  const custId = document.getElementById('entry-customer').value;
+  const month  = parseInt(document.getElementById('entry-month').value);
+  const year   = parseInt(document.getElementById('entry-year').value);
+  if (!selectedDay) return;
+  const key = eKey(custId, year, month, selectedDay);
+  delete entries[key]; delete extraEntries[key];
+  save(); loadCalendar();
+  document.getElementById('entry-panel').classList.remove('visible');
+  toast('🗑️ Entry हटाइयो।');
+}
+
+function updateSummary(custId, month, year) {
+  const cust = customers.find(c => c.id === custId);
+  const days = DAYS_IN_MONTH[month-1];
+  let totalLtr = 0, daysCount = 0;
+  for (let d = 1; d <= days; d++) {
+    const key = eKey(custId, year, month, d);
+    if (entries[key] !== undefined && entries[key] > 0) { totalLtr += entries[key]; daysCount++; }
+  }
+  const amt = totalLtr * cust.rate;
+  document.getElementById('sum-days').textContent = daysCount;
+  document.getElementById('sum-ltrs').textContent = totalLtr + ' L';
+  document.getElementById('sum-amt').textContent  = 'रु.' + amt.toLocaleString();
+  document.getElementById('month-summary').style.display = 'block';
+}
+
+// ── BILL GENERATE ──
+function generateBill() {
+  const custId = document.getElementById('bill-customer').value;
+  const month  = parseInt(document.getElementById('bill-month').value);
+  const year   = parseInt(document.getElementById('bill-year').value);
+  if (!custId) {
+    document.getElementById('bill-area').innerHTML = `<div class="empty"><div class="empty-icon">🧾</div><p>Customer र महिना छानेर Bill हेर्नुस्।</p></div>`;
+    return;
+  }
+  const cust = customers.find(c => c.id === custId);
+  const milkRate = parseFloat(document.getElementById('bill-rate-override')?.value) || cust.rate;
+  const dueOverride = document.getElementById('bill-due-override').value;
+  const prevDue = dueOverride !== '' ? parseFloat(dueOverride)||0 : (cust.due||0);
+  const days = DAYS_IN_MONTH[month-1];
+
+  let milkRows = [], totalLtr = 0, daysWithMilk = 0;
+  // collect extra items totals: { itemId: totalQty }
+  let extraTotals = {};
+
+  for (let d = 1; d <= days; d++) {
+    const key = eKey(custId, year, month, d);
+    if (entries[key] !== undefined) {
+      const ltr = entries[key];
+      if (ltr > 0) { totalLtr += ltr; daysWithMilk++; }
+      milkRows.push({ day: d, ltr });
+    }
+    // extra
+    if (extraEntries[key]) {
+      Object.entries(extraEntries[key]).forEach(([iid, qty]) => {
+        extraTotals[iid] = (extraTotals[iid]||0) + qty;
+      });
+    }
+  }
+
+  if (!milkRows.length && !Object.keys(extraTotals).length) {
+    document.getElementById('bill-area').innerHTML = `<div class="empty"><div class="empty-icon">📭</div><p>${MONTHS[month-1]} ${year} मा कुनै entry छैन।</p></div>`;
+    return;
+  }
+
+  // Group milk by ltr
+  const milkGroups = {};
+  milkRows.filter(r => r.ltr > 0).forEach(r => {
+    if (!milkGroups[r.ltr]) milkGroups[r.ltr] = { ltr: r.ltr, count: 0 };
+    milkGroups[r.ltr].count++;
+  });
+
+  const milkTotal = totalLtr * milkRate;
+
+  // Extra items total
+  let extraTotal = 0;
+  const extraRows = Object.entries(extraTotals).map(([iid, qty]) => {
+    const it = items.find(x => x.id === iid);
+    if (!it) return null;
+    const amt = qty * it.rate;
+    extraTotal += amt;
+    return { name: it.name, qty, unit: it.unit, rate: it.rate, amt };
+  }).filter(Boolean);
+
+  const grandTotal = milkTotal + extraTotal + prevDue;
+  const paid      = getTotalPaid(custId, month, year);
+  const remaining = grandTotal - paid;
+  const payList   = payments[payKey(custId, year, month)] || [];
+
+  const remainingColor = remaining > 0 ? 'var(--red)' : remaining < 0 ? 'var(--green)' : 'var(--teal)';
+  const remainingLabel = remaining > 0 ? '⚠️ बाँकी' : remaining < 0 ? '✅ Overpaid' : '✅ Paid';
+  const milkRowsHtml = Object.values(milkGroups).sort((a,b)=>a.ltr-b.ltr).map((g,i) => {
+    const sub = g.ltr * g.count;
+    const amt = sub * milkRate;
+    return `<tr>
+      <td style="color:#aaa;font-size:.75rem">${i+1}</td>
+      <td style="color:#7dd3fc;font-weight:700">🥛 दूध (${g.ltr}L/दिन)</td>
+      <td style="font-weight:700">${g.count} दिन</td>
+      <td style="font-weight:700;color:#6fb8ff">${sub} L</td>
+      <td>रु.${milkRate}</td>
+      <td style="font-weight:800;color:#1e88c8">रु.${amt.toLocaleString()}</td>
+    </tr>`;
+  }).join('');
+
+  const extraRowsHtml = extraRows.map((r,i) => `
+    <tr style="background:rgba(167,139,250,.04)">
+      <td style="color:#aaa;font-size:.75rem">${Object.values(milkGroups).length+i+1}</td>
+      <td style="color:#a78bfa;font-weight:700">📦 ${r.name}</td>
+      <td style="font-weight:700">${r.qty} ${r.unit}</td>
+      <td>—</td>
+      <td>रु.${r.rate}/${r.unit}</td>
+      <td style="font-weight:800;color:#a78bfa">रु.${r.amt.toLocaleString()}</td>
+    </tr>`).join('');
+
+  const prevDueHtml = prevDue > 0 ? `
+    <tr style="background:rgba(255,107,107,.05)">
+      <td colspan="5" style="color:var(--red);font-weight:700">⚠️ अघिल्लो बाँकी (Previous Due)</td>
+      <td style="font-weight:900;color:var(--red)">+ रु.${prevDue.toLocaleString()}</td>
+    </tr>` : '';
+
+  document.getElementById('bill-area').innerHTML = `
+    <div class="bill-card">
+      <div class="bill-header">
+        <div>
+          <div class="bill-cust-name">🥛 ${cust.name}</div>
+          <div class="bill-period">${cust.addr||''} · ${MONTHS[month-1]} ${year}</div>
+          <div style="margin-top:5px;display:flex;gap:4px;flex-wrap:wrap;">
+            <span class="badge badge-blue">दूध: रु.${milkRate}/L</span>
+            ${extraRows.length ? `<span class="badge badge-purple">+${extraRows.length} items</span>` : ''}
+            ${prevDue > 0 ? `<span class="badge badge-red">Due: रु.${prevDue}</span>` : ''}
+          </div>
+        </div>
+        <div style="text-align:right">
+          <div class="bill-total-lbl">जम्मा रकम</div>
+          <div class="bill-total-amt">रु.${grandTotal.toLocaleString()}</div>
+        </div>
+      </div>
+
+      <table class="bill-table">
+        <thead><tr>
+          <th>#</th><th>विवरण</th><th>परिमाण</th><th>कुल</th><th>दर</th><th>रकम</th>
+        </tr></thead>
+        <tbody>
+          ${milkRowsHtml}
+          ${extraRowsHtml}
+          ${prevDueHtml}
+        </tbody>
+      </table>
+
+      <div class="bill-footer" style="grid-template-columns:1fr 1fr 1fr 1fr;">
+        <div class="bf-item"><div class="bf-lbl">दूध (L)</div><div class="bf-val blue">${totalLtr}L</div></div>
+        <div class="bf-item"><div class="bf-lbl">जम्मा Bill</div><div class="bf-val gold">रु.${grandTotal.toLocaleString()}</div></div>
+        <div class="bf-item"><div class="bf-lbl">💰 भुक्तानी</div><div class="bf-val green">रु.${paid.toLocaleString()}</div></div>
+        <div class="bf-item"><div class="bf-lbl">${remainingLabel}</div><div class="bf-val" style="color:${remainingColor}">रु.${Math.abs(remaining).toLocaleString()}</div></div>
+      </div>
+    </div>
+
+    ${prevDue > 0 ? `<div class="due-box"><div class="due-box-title">⚠️ Previous Due</div><div class="due-amount">रु.${prevDue.toLocaleString()}</div><div style="font-size:.75rem;color:var(--muted);margin-top:2px;">यो महिनाको bill मा जोडिएको छ।</div></div>` : ''}
+
+    <div style="background:rgba(245,200,66,.07);border:1px solid rgba(245,200,66,.2);border-radius:10px;padding:12px 14px;margin-bottom:10px;font-size:.82rem;color:var(--muted);line-height:1.9;">
+      📌 <strong style="color:var(--gold)">${MONTHS[month-1]} ${year} हिसाब:</strong><br>
+      🥛 दूध: ${totalLtr}L × रु.${milkRate} = <strong style="color:var(--white)">रु.${milkTotal.toLocaleString()}</strong><br>
+      ${extraRows.map(r=>`📦 ${r.name}: ${r.qty}${r.unit} × रु.${r.rate} = <strong style="color:var(--white)">रु.${r.amt.toLocaleString()}</strong>`).join('<br>')}
+      ${prevDue > 0 ? `<br>⚠️ Previous Due: <strong style="color:var(--red)">रु.${prevDue.toLocaleString()}</strong>` : ''}
+      <br>─────────────────<br>
+      💰 जम्मा Bill: <strong style="color:var(--gold);font-size:.9rem;">रु.${grandTotal.toLocaleString()}</strong><br>
+      ✅ भुक्तानी भएको: <strong style="color:var(--green);">रु.${paid.toLocaleString()}</strong><br>
+      <span style="font-size:.9rem;">${remainingLabel} बाँकी: <strong style="color:${remainingColor};font-size:.95rem;">रु.${Math.abs(remaining).toLocaleString()}</strong></span>
+    </div>
+
+    ${payList.length > 0 ? `
+    <div class="card" style="padding:12px 14px;margin-bottom:10px;">
+      <div class="card-title" style="color:var(--green)">💰 भुक्तानी इतिहास</div>
+      ${payList.map(p=>`<div class="ledger-row"><span>📅 ${p.date}${p.note?' · '+p.note:''}</span><span class="ledger-cr">+रु.${p.amount.toLocaleString()}</span></div>`).join('')}
+    </div>` : ''}
+
+    <button class="btn btn-primary" onclick="printBill('${custId}',${month},${year},${milkRate},${prevDue})">🖨️ Print गर्नुस्</button>
+  `;
+}
+
+// ── PRINT BILL ──
+function printBill(custId, month, year, milkRate, prevDue) {
+  const cust = customers.find(c => c.id === custId);
+  const days = DAYS_IN_MONTH[month-1];
+  let milkRows = [], totalLtr = 0;
+  let extraTotals = {};
+
+  for (let d = 1; d <= days; d++) {
+    const key = eKey(custId, year, month, d);
+    if (entries[key] !== undefined) {
+      milkRows.push({ day: d, ltr: entries[key] });
+      if (entries[key] > 0) totalLtr += entries[key];
+    }
+    if (extraEntries[key]) {
+      Object.entries(extraEntries[key]).forEach(([iid,qty]) => {
+        extraTotals[iid] = (extraTotals[iid]||0) + qty;
+      });
+    }
+  }
+
+  const milkGroups = {};
+  milkRows.filter(r=>r.ltr>0).forEach(r=>{
+    if (!milkGroups[r.ltr]) milkGroups[r.ltr]={ltr:r.ltr,count:0};
+    milkGroups[r.ltr].count++;
+  });
+
+  const milkTotal = totalLtr * milkRate;
+  let extraTotal = 0;
+  const extraRows = Object.entries(extraTotals).map(([iid,qty])=>{
+    const it = items.find(x=>x.id===iid); if(!it) return null;
+    const amt = qty * it.rate; extraTotal += amt;
+    return {name:it.name,qty,unit:it.unit,rate:it.rate,amt};
+  }).filter(Boolean);
+  const grandTotal = milkTotal + extraTotal + prevDue;
+
+  const milkRowsHtml = Object.values(milkGroups).sort((a,b)=>a.ltr-b.ltr).map((g,i)=>{
+    const sub=g.ltr*g.count; const amt=sub*milkRate;
+    return `<tr><td>${i+1}</td><td>🥛 दूध (${g.ltr}L/दिन)</td><td>${g.count} दिन</td><td>${sub} L</td><td>रु.${milkRate}/L</td><td>रु.${amt.toLocaleString()}</td></tr>`;
+  }).join('');
+
+  const extraRowsHtml = extraRows.map((r,i)=>`
+    <tr class="extra-row"><td>${Object.values(milkGroups).length+i+1}</td><td>📦 ${r.name}</td><td>${r.qty} ${r.unit}</td><td>—</td><td>रु.${r.rate}/${r.unit}</td><td>रु.${r.amt.toLocaleString()}</td></tr>`).join('');
+
+  const prevDueHtml = prevDue>0 ? `<tr class="due-row"><td colspan="5">⚠️ अघिल्लो बाँकी (Previous Due)</td><td>+ रु.${prevDue.toLocaleString()}</td></tr>` : '';
+
+  const html = `<!DOCTYPE html><html lang="ne"><head><meta charset="UTF-8">
+<title>Bill — ${cust.name} — ${MONTHS[month-1]} ${year}</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Nunito',Arial,sans-serif;background:#f5f7fa;color:#1a1a2e;padding:20px;}
+  .wrap{max-width:700px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.12);border:1px solid #e0e8f0;}
+  .co-header{background:linear-gradient(135deg,#0a3d6b,#1565a0,#1e88c8);padding:22px 28px 18px;color:white;position:relative;overflow:hidden;}
+  .co-header::after{content:'';position:absolute;top:-20px;right:-20px;width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,.06);}
+  .co-row{display:flex;align-items:center;gap:12px;margin-bottom:8px;}
+  .co-icon{font-size:2.4rem;}
+  .co-name{font-size:1.6rem;font-weight:900;line-height:1.1;}
+  .co-name span{color:#7dd3fc;}
+  .co-tag{font-size:.7rem;opacity:.7;letter-spacing:2px;text-transform:uppercase;}
+  .co-details{font-size:.8rem;opacity:.88;margin-top:8px;line-height:1.8;}
+  .pan{display:inline-block;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:4px;padding:2px 10px;font-size:.72rem;font-weight:700;letter-spacing:1px;margin-top:6px;}
+  .meta-bar{background:#f0f7ff;border-bottom:2px solid #1565a0;padding:10px 28px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;}
+  .meta-title{font-size:.95rem;font-weight:800;color:#0a3d6b;letter-spacing:1px;text-transform:uppercase;}
+  .meta-date{font-size:.75rem;color:#666;font-weight:600;}
+  .info-grid{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid #e8f0f8;}
+  .info-box{padding:14px 24px;border-right:1px solid #e8f0f8;}
+  .info-box:last-child{border-right:none;}
+  .info-lbl{font-size:.65rem;letter-spacing:2px;text-transform:uppercase;color:#888;font-weight:700;margin-bottom:3px;}
+  .info-val{font-size:.98rem;font-weight:800;color:#1a1a2e;}
+  .info-sub{font-size:.75rem;color:#666;margin-top:1px;}
+  .tw{padding:0 24px;}
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:.85rem;}
+  thead tr{background:#0a3d6b;color:white;}
+  th{padding:9px 10px;text-align:left;font-size:.68rem;letter-spacing:1.5px;text-transform:uppercase;font-weight:700;}
+  td{padding:8px 10px;border-bottom:1px solid #eef3f8;color:#2a2a40;}
+  tr:nth-child(even) td{background:#f8fbff;}
+  tr:last-child td{border-bottom:none;}
+  .extra-row td{color:#5b21b6;}
+  .due-row td{color:#dc2626;font-weight:700;background:#fff5f5!important;}
+  .sum-box{margin:0 24px 16px;border:2px solid #1565a0;border-radius:10px;overflow:hidden;}
+  .sum-grid{display:grid;grid-template-columns:1fr 1fr 1fr;}
+  .sc{padding:12px 8px;text-align:center;border-right:1px solid #d0e4f5;}
+  .sc:last-child{border-right:none;}
+  .sl{font-size:.65rem;letter-spacing:1.5px;text-transform:uppercase;color:#888;font-weight:700;}
+  .sv{font-size:1.15rem;font-weight:900;margin-top:2px;}
+  .sv.b{color:#1565a0;}.sv.g{color:#15803d;}
+  .tot-bar{background:linear-gradient(135deg,#0a3d6b,#1565a0);color:white;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;}
+  .tot-formula{font-size:.82rem;opacity:.85;}
+  .tot-amt{font-size:1.5rem;font-weight:900;}
+  .due-notice{margin:0 24px 16px;background:#fff5f5;border:1.5px solid #fca5a5;border-radius:8px;padding:10px 14px;}
+  .due-notice-title{font-size:.68rem;letter-spacing:2px;text-transform:uppercase;color:#dc2626;font-weight:700;margin-bottom:4px;}
+  .due-notice-amt{font-size:1.1rem;font-weight:900;color:#dc2626;}
+  .foot{padding:14px 24px;display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:10px;border-top:1px dashed #cbd5e0;}
+  .foot-note{font-size:.72rem;color:#888;line-height:1.7;}
+  .sig-line{width:130px;border-top:1.5px solid #333;margin-bottom:3px;}
+  .sig-lbl{font-size:.68rem;color:#666;font-weight:700;letter-spacing:1px;}
+  .wm{background:#f0f7ff;text-align:center;padding:7px;font-size:.68rem;color:#aaa;border-top:1px solid #e8f0f8;}
+  @media print{body{background:white;padding:0;}.wrap{box-shadow:none;border:none;border-radius:0;}.no-print{display:none!important;}}
+</style></head><body>
+<div class="wrap">
+  <div class="co-header">
+    <div class="co-row">
+        <svg width="56" height="56" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="60" cy="60" r="58" fill="#0a3d6b"/>
+          <ellipse cx="60" cy="72" rx="28" ry="18" fill="#f5f0e8" stroke="#c8a97a" stroke-width="1.5"/>
+          <ellipse cx="84" cy="60" rx="13" ry="11" fill="#f5f0e8" stroke="#c8a97a" stroke-width="1.5"/>
+          <ellipse cx="91" cy="64" rx="6" ry="4.5" fill="#f0c8b0" stroke="#c8a97a" stroke-width="1"/>
+          <circle cx="89" cy="65" r="1.2" fill="#b0806a"/><circle cx="93" cy="65" r="1.2" fill="#b0806a"/>
+          <circle cx="83" cy="57" r="2.2" fill="#2a1a0a"/><circle cx="83.8" cy="56.3" r="0.7" fill="white"/>
+          <ellipse cx="77" cy="50" rx="4" ry="6" fill="#f5f0e8" stroke="#c8a97a" stroke-width="1.2" transform="rotate(-20 77 50)"/>
+          <ellipse cx="77" cy="50" rx="2.2" ry="3.5" fill="#f0c0b0" transform="rotate(-20 77 50)"/>
+          <path d="M78 49 Q74 40 78 38" stroke="#d4aa60" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          <path d="M82 47 Q80 38 85 37" stroke="#d4aa60" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          <ellipse cx="52" cy="68" rx="7" ry="5" fill="#8B6B4A" opacity="0.5" transform="rotate(-15 52 68)"/>
+          <ellipse cx="66" cy="75" rx="5" ry="4" fill="#8B6B4A" opacity="0.4" transform="rotate(10 66 75)"/>
+          <rect x="38" y="86" width="6" height="13" rx="3" fill="#f0e8d8" stroke="#c8a97a" stroke-width="1"/>
+          <rect x="48" y="87" width="6" height="13" rx="3" fill="#f0e8d8" stroke="#c8a97a" stroke-width="1"/>
+          <rect x="62" y="87" width="6" height="13" rx="3" fill="#f0e8d8" stroke="#c8a97a" stroke-width="1"/>
+          <rect x="72" y="86" width="6" height="13" rx="3" fill="#f0e8d8" stroke="#c8a97a" stroke-width="1"/>
+          <ellipse cx="55" cy="89" rx="10" ry="6" fill="#f4b8c0" stroke="#d88899" stroke-width="1"/>
+          <ellipse cx="26" cy="75" rx="5" ry="7" fill="white" opacity="0.92"/>
+          <ellipse cx="26" cy="69" rx="3.5" ry="3.5" fill="white" opacity="0.92"/>
+          <line x1="19" y1="80" x2="16" y2="76" stroke="white" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+          <line x1="33" y1="80" x2="36" y2="76" stroke="white" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+          <line x1="26" y1="83" x2="26" y2="87" stroke="white" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+          <path d="M32 72 Q22 65 24 56 Q25 52 28 54" stroke="#c8a97a" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <ellipse cx="28.5" cy="53" rx="3" ry="4" fill="#c8a97a" transform="rotate(-20 28.5 53)"/>
+        </svg>
+      <div><div class="co-name">Sinkemani <span>Dairy</span></div><div class="co-tag">Fresh Milk Delivery Service</div></div>
+    </div>
+    <div class="co-details">
+      📍 Kalimatidole-09, Airport, Kathmandu<br>
+      📞 9841806402 &nbsp;|&nbsp; 9860753857
+    </div>
+    <div class="pan">PAN No: 113163375</div>
+  </div>
+
+  <div class="meta-bar">
+    <div class="meta-title">🧾 दूध बिल / Milk Bill</div>
+    <div class="meta-date">मिति: ${new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})}</div>
+  </div>
+
+  <div class="info-grid">
+    <div class="info-box">
+      <div class="info-lbl">Customer</div>
+      <div class="info-val">${cust.name}</div>
+      <div class="info-sub">${cust.addr||'ठेगाना उल्लेख छैन'}</div>
+    </div>
+    <div class="info-box">
+      <div class="info-lbl">बिलिङ अवधि</div>
+      <div class="info-val">${MONTHS[month-1]} ${year}</div>
+      <div class="info-sub">दूध दर: रु.${milkRate}/लिटर</div>
+    </div>
+  </div>
+
+  <div class="tw">
+    <table>
+      <thead><tr><th>#</th><th>विवरण</th><th>परिमाण</th><th>कुल</th><th>दर</th><th>रकम (रु.)</th></tr></thead>
+      <tbody>
+        ${milkRowsHtml}
+        ${extraRowsHtml}
+        ${prevDueHtml}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="sum-box">
+    <div class="sum-grid">
+      <div class="sc"><div class="sl">दूध (L)</div><div class="sv b">${totalLtr}L</div></div>
+      <div class="sc"><div class="sl">Items रकम</div><div class="sv g">रु.${extraTotal.toLocaleString()}</div></div>
+      <div class="sc"><div class="sl">दिन</div><div class="sv b">${Object.values(milkGroups).reduce((a,g)=>a+g.count,0)}</div></div>
+    </div>
+    <div class="tot-bar">
+      <div class="tot-formula">${totalLtr}L×रु.${milkRate}${extraTotal>0?` + Items रु.${extraTotal.toLocaleString()}`:''}${prevDue>0?` + Due रु.${prevDue.toLocaleString()}`:''}</div>
+      <div class="tot-amt">रु.${grandTotal.toLocaleString()}</div>
+    </div>
+  </div>
+
+  ${prevDue>0?`<div class="due-notice"><div class="due-notice-title">⚠️ अघिल्लो बाँकी सामेल</div><div class="due-notice-amt">रु.${prevDue.toLocaleString()}</div></div>`:''}
+
+  <div class="foot">
+    <div class="foot-note">🙏 Sinkemani Dairy मा भरोसा राख्नु भएकोमा धन्यवाद।<br>सम्पर्क: 9841806402 / 9860753857</div>
+    <div><div class="sig-line"></div><div class="sig-lbl">Authorized Signature</div></div>
+  </div>
+  <div class="wm">Sinkemani Dairy · Kalimatidole-09, Airport, Kathmandu · PAN: 113163375</div>
+</div>
+
+<div style="text-align:center;margin-top:18px;" class="no-print">
+  <button onclick="window.print()" style="padding:11px 30px;background:#0a3d6b;color:white;border:none;border-radius:8px;font-size:.95rem;font-weight:700;cursor:pointer;font-family:Nunito,sans-serif;">🖨️ Print गर्नुस्</button>
+</div>
+<script>window.onload=()=>window.print();<\/script>
+</body></html>`;
+
+  const win = window.open('','_blank');
+  if (!win) { toast('❌ Popup block भयो! Browser मा popup allow गर्नुस्।'); return; }
+  win.document.write(html);
+  win.document.close();
+}
+
+// ── PAYMENT FUNCTIONS ──
+function payKey(custId, year, month) { return `${custId}_${year}_${month}`; }
+
+function getMonthBillTotal(custId, year, month) {
+  const cust = customers.find(c => c.id === custId);
+  if (!cust) return 0;
+  const days = DAYS_IN_MONTH[month-1];
+  let totalLtr = 0, extraTotal = 0;
+  let extraTotals = {};
+  for (let d = 1; d <= days; d++) {
+    const k = eKey(custId, year, month, d);
+    if (entries[k] !== undefined && entries[k] > 0) totalLtr += entries[k];
+    if (extraEntries[k]) Object.entries(extraEntries[k]).forEach(([iid,qty]) => { extraTotals[iid]=(extraTotals[iid]||0)+qty; });
+  }
+  Object.entries(extraTotals).forEach(([iid,qty]) => {
+    const it = items.find(x=>x.id===iid); if(it) extraTotal += qty * it.rate;
+  });
+  return (totalLtr * cust.rate) + extraTotal + (cust.due||0);
+}
+
+function getTotalPaid(custId, year, month) {
+  const k = payKey(custId, year, month);
+  return (payments[k]||[]).reduce((sum,p) => sum+p.amount, 0);
+}
+
+function loadPaymentSummary() {
+  const custId = document.getElementById('pay-customer').value;
+  const month  = parseInt(document.getElementById('pay-month').value);
+  const year   = parseInt(document.getElementById('pay-year').value);
+  const balArea  = document.getElementById('pay-balance-area');
+  const addCard  = document.getElementById('pay-add-card');
+  const histArea = document.getElementById('pay-history-area');
+
+  if (!custId) {
+    balArea.innerHTML  = '';
+    histArea.innerHTML = '';
+    addCard.style.display = 'none';
+    return;
+  }
+
+  const cust      = customers.find(c => c.id === custId);
+  const billTotal = getMonthBillTotal(custId, year, month);
+  const paid      = getTotalPaid(custId, year, month);
+  const remaining = billTotal - paid;
+  const k         = payKey(custId, year, month);
+  const payList   = payments[k] || [];
+
+  // Balance box
+  let boxClass = remaining > 0 ? 'negative' : remaining < 0 ? 'positive' : 'zero';
+  let boxLabel = remaining > 0 ? '⚠️ बाँकी रकम (Remaining Due)' : remaining < 0 ? '✅ अधिक भुक्तानी (Overpaid)' : '✅ पूरै भुक्तानी भयो!';
+  let balColor = remaining > 0 ? 'var(--red)' : remaining < 0 ? 'var(--green)' : 'var(--blue-light)';
+  let subMsg   = remaining > 0 ? `Customer ले रु.${remaining.toLocaleString()} अझै दिनु बाँकी छ।`
+               : remaining < 0 ? `Customer ले रु.${Math.abs(remaining).toLocaleString()} बढी दिनुभयो।`
+               : 'सबै हिसाब मिल्यो!';
+
+  balArea.innerHTML = `
+    <div class="balance-box ${boxClass}">
+      <div class="balance-lbl" style="color:${balColor}">${boxLabel}</div>
+      <div class="balance-amt" style="color:${balColor}">रु.${Math.abs(remaining).toLocaleString()}</div>
+      <div class="balance-sub" style="color:${balColor}">${subMsg}</div>
+    </div>
+    <div class="card" style="padding:12px 14px;">
+      <div class="card-title">📊 ${MONTHS[month-1]} ${year} लेजर</div>
+      <div class="ledger-row"><span>🧾 जम्मा Bill</span><span class="ledger-dr">रु.${billTotal.toLocaleString()}</span></div>
+      <div class="ledger-row"><span>💰 जम्मा भुक्तानी</span><span class="ledger-cr">रु.${paid.toLocaleString()}</span></div>
+      <div class="ledger-row" style="font-weight:800;font-size:.9rem;">
+        <span>${remaining>=0?'⚠️ बाँकी':'✅ Overpaid'}</span>
+        <span style="color:${balColor}">रु.${Math.abs(remaining).toLocaleString()}</span>
+      </div>
+    </div>`;
+
+  addCard.style.display = 'block';
+
+  // Payment history
+  if (!payList.length) {
+    histArea.innerHTML = `<div class="empty"><div class="empty-icon">💸</div><p>अहिलेसम्म कुनै भुक्तानी record छैन।</p></div>`;
+  } else {
+    histArea.innerHTML = `
+      <div class="section-title">📋 भुक्तानी इतिहास</div>
+      ${payList.slice().reverse().map(p => `
+        <div class="pay-history-item">
+          <div>
+            <div class="pay-amount">+ रु.${p.amount.toLocaleString()}</div>
+            <div class="pay-meta">📅 ${p.date} &nbsp;·&nbsp; ID: ${p.id.slice(-4)}</div>
+            ${p.note ? `<div class="pay-note">📝 ${p.note}</div>` : ''}
+          </div>
+          <button class="btn btn-danger" onclick="deletePayment('${custId}',${year},${month},'${p.id}')">हटाउ</button>
+        </div>`).join('')}`;
+  }
+}
+
+function addPayment() {
+  const custId = document.getElementById('pay-customer').value;
+  const month  = parseInt(document.getElementById('pay-month').value);
+  const year   = parseInt(document.getElementById('pay-year').value);
+  const amount = parseFloat(document.getElementById('pay-amount-input').value);
+  const date   = document.getElementById('pay-date-input').value.trim() || `${MONTHS[month-1]} ${year}`;
+  const note   = document.getElementById('pay-note-input').value.trim();
+
+  if (!custId) { toast('❌ Customer छान्नुस्!'); return; }
+  if (!amount || amount <= 0) { toast('❌ रकम हाल्नुस्!'); return; }
+
+  const k = payKey(custId, year, month);
+  if (!payments[k]) payments[k] = [];
+  payments[k].push({ id: Date.now().toString(), amount, date, note });
+  save();
+
+  document.getElementById('pay-amount-input').value = '';
+  document.getElementById('pay-date-input').value   = '';
+  document.getElementById('pay-note-input').value   = '';
+
+  loadPaymentSummary();
+  toast(`✅ रु.${amount.toLocaleString()} भुक्तानी save भयो!`);
+}
+
+function deletePayment(custId, year, month, pid) {
+  if (!confirm('यो भुक्तानी हटाउने?')) return;
+  const k = payKey(custId, year, month);
+  payments[k] = (payments[k]||[]).filter(p => p.id !== pid);
+  save(); loadPaymentSummary(); toast('🗑️ भुक्तानी हटाइयो।');
+}
+
+// ── INIT ──
+renderCustomers();
+renderItems();
+populateDropdown('entry-customer');
+populateDropdown('bill-customer');
+populateDropdown('pay-customer');
+
+// ── PWA SETUP ──
+const iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192"><circle cx="96" cy="96" r="92" fill="#0a3d6b"/><ellipse cx="96" cy="115" rx="44" ry="29" fill="#f5f0e8" stroke="#c8a97a" stroke-width="2"/><ellipse cx="134" cy="96" rx="21" ry="18" fill="#f5f0e8" stroke="#c8a97a" stroke-width="2"/><ellipse cx="145" cy="103" rx="10" ry="7" fill="#f0c8b0" stroke="#c8a97a" stroke-width="1.5"/><circle cx="144" cy="105" r="2" fill="#b0806a"/><circle cx="148" cy="105" r="2" fill="#b0806a"/><circle cx="133" cy="91" r="3.5" fill="#2a1a0a"/><circle cx="134.2" cy="89.8" r="1.1" fill="white"/><ellipse cx="122" cy="79" rx="6" ry="9" fill="#f5f0e8" stroke="#c8a97a" stroke-width="1.5" transform="rotate(-20 122 79)"/><ellipse cx="122" cy="79" rx="3.5" ry="5.5" fill="#f0c0b0" transform="rotate(-20 122 79)"/><path d="M124 78 Q118 63 122 60" stroke="#d4aa60" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M130 75 Q128 61 136 59" stroke="#d4aa60" stroke-width="3" fill="none" stroke-linecap="round"/><ellipse cx="83" cy="110" rx="11" ry="8" fill="#8B6B4A" opacity="0.45" transform="rotate(-15 83 110)"/><ellipse cx="105" cy="120" rx="8" ry="6" fill="#8B6B4A" opacity="0.35" transform="rotate(10 105 120)"/><rect x="61" y="138" width="10" height="20" rx="5" fill="#f0e8d8" stroke="#c8a97a" stroke-width="1.5"/><rect x="76" y="140" width="10" height="20" rx="5" fill="#f0e8d8" stroke="#c8a97a" stroke-width="1.5"/><rect x="99" y="140" width="10" height="20" rx="5" fill="#f0e8d8" stroke="#c8a97a" stroke-width="1.5"/><rect x="114" y="138" width="10" height="20" rx="5" fill="#f0e8d8" stroke="#c8a97a" stroke-width="1.5"/><ellipse cx="86" cy="143" rx="16" ry="9" fill="#f4b8c0" stroke="#d88899" stroke-width="1.5"/><ellipse cx="42" cy="118" rx="8" ry="11" fill="white" opacity="0.93"/><ellipse cx="42" cy="109" rx="5.5" ry="5.5" fill="white" opacity="0.93"/><line x1="32" y1="125" x2="27" y2="119" stroke="white" stroke-width="2" stroke-linecap="round" opacity="0.65"/><line x1="52" y1="125" x2="57" y2="119" stroke="white" stroke-width="2" stroke-linecap="round" opacity="0.65"/><line x1="42" y1="129" x2="42" y2="135" stroke="white" stroke-width="2" stroke-linecap="round" opacity="0.65"/><path d="M51 115 Q36 104 38 89 Q39 83 44 86" stroke="#c8a97a" stroke-width="3" fill="none" stroke-linecap="round"/><ellipse cx="44.5" cy="85" rx="5" ry="6" fill="#c8a97a" transform="rotate(-20 44.5 85)"/></svg>`;
+const iconB64 = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(iconSvg)));
+
+// Set apple touch icon
+document.getElementById('apple-icon').href = iconB64;
+
+// Inline manifest
+const manifest = {
+  name: 'Sinkemani Dairy — दूध हिसाब',
+  short_name: 'Dudh Hisab',
+  description: 'दैनिक दूध डेलिभरी ट्र्याकर',
+  start_url: '.',
+  display: 'standalone',
+  background_color: '#0f1923',
+  theme_color: '#0f1923',
+  orientation: 'portrait',
+  icons: [
+    { src: iconB64, sizes: '192x192', type: 'image/svg+xml', purpose: 'any maskable' },
+    { src: iconB64, sizes: '512x512', type: 'image/svg+xml', purpose: 'any maskable' }
+  ]
+};
+const manifestBlob = new Blob([JSON.stringify(manifest)], {type:'application/json'});
+document.getElementById('pwa-manifest').href = URL.createObjectURL(manifestBlob);
+
+// Service Worker (inline via blob)
+const swCode = `
+const CACHE = 'dudh-hisab-v1';
+self.addEventListener('install', e => {
+  self.skipWaiting();
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(['./', './index.html'])).catch(()=>{}));
+});
+self.addEventListener('activate', e => {
+  e.waitUntil(clients.claim());
+});
+self.addEventListener('fetch', e => {
+  e.respondWith(
+    caches.match(e.request).then(r => r || fetch(e.request).catch(() => new Response('Offline', {status:200})))
+  );
+});
+`;
+if ('serviceWorker' in navigator) {
+  const swBlob = new Blob([swCode], {type:'application/javascript'});
+  const swUrl  = URL.createObjectURL(swBlob);
+  navigator.serviceWorker.register(swUrl, {scope: './'})
+    .then(() => console.log('SW registered'))
+    .catch(e => console.log('SW error:', e));
+}
+
+// ── INSTALL PROMPT ──
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  showInstallBanner();
+});
+
+function showInstallBanner() {
+  if (document.getElementById('install-banner')) return;
+  const banner = document.createElement('div');
+  banner.id = 'install-banner';
+  banner.style.cssText = `position:fixed;bottom:70px;left:50%;transform:translateX(-50%);
+    background:linear-gradient(135deg,#1565a0,#0a3d6b);color:white;padding:12px 18px;
+    border-radius:12px;display:flex;align-items:center;gap:10px;z-index:9999;
+    box-shadow:0 8px 28px rgba(0,0,0,.5);max-width:320px;width:90%;font-family:'Nunito',sans-serif;`;
+  banner.innerHTML = `
+    <span style="font-size:1.5rem">📲</span>
+    <div style="flex:1">
+      <div style="font-size:.82rem;font-weight:800;">Mobile मा Install गर्नुस्!</div>
+      <div style="font-size:.72rem;opacity:.8;">Home screen मा App थपिन्छ</div>
+    </div>
+    <button onclick="installApp()" style="background:#f5c842;color:#0a3d6b;border:none;padding:7px 13px;border-radius:8px;font-weight:800;font-size:.78rem;cursor:pointer;font-family:'Nunito',sans-serif;">Install</button>
+    <button onclick="this.parentElement.remove()" style="background:rgba(255,255,255,.15);color:white;border:none;width:26px;height:26px;border-radius:50%;font-size:.9rem;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>`;
+  document.body.appendChild(banner);
+}
+
+function installApp() {
+  if (!deferredPrompt) {
+    // iOS fallback instructions
+    toast('Safari मा Share (↑) → "Add to Home Screen" थिच्नुस्!');
+    document.getElementById('install-banner')?.remove();
+    return;
+  }
+  deferredPrompt.prompt();
+  deferredPrompt.userChoice.then(r => {
+    if (r.outcome === 'accepted') toast('✅ App install भयो!');
+    deferredPrompt = null;
+    document.getElementById('install-banner')?.remove();
+  });
+}
+
+// iOS: show manual instructions if standalone not detected
+window.addEventListener('load', () => {
+  const isIos = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+  if (isIos && !isStandalone) {
+    setTimeout(() => {
+      if (!document.getElementById('install-banner')) showInstallBanner();
+    }, 2500);
+  }
+});
+
+// Installed confirmation
+window.addEventListener('appinstalled', () => {
+  toast('🎉 App successfully install भयो!');
+  document.getElementById('install-banner')?.remove();
+});
+</script>
+</body>
+</html>
